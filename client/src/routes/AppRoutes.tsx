@@ -1,0 +1,24 @@
+import { Route, Routes } from 'react-router-dom';
+import AppLayout from '../layout/AppLayout';
+
+const SampleComponent = () => {
+  return (
+    <>
+      <h1 className="text-blue-800">Hello Eberywone!</h1>
+    </>
+  );
+};
+
+const AppRoutes = () => {
+  return (
+    <>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<SampleComponent />} />
+        </Route>
+      </Routes>
+    </>
+  );
+};
+
+export default AppRoutes;
