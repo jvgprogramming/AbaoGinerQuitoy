@@ -6,9 +6,10 @@ import type { GenderFieldErrors } from '../../../interfaces/GenderFieldErrors';
 
 interface AddGenderFormProps{
   onGenderAdded: (message: string) => void
+  refreshKey: () => void
 }
 
-const AddGenderForm: FC<AddGenderFormProps> = ({onGenderAdded}) => {
+const AddGenderForm: FC<AddGenderFormProps> = ({onGenderAdded, refreshKey }) => {
   const [loadingStore, setLoadingStore] = useState(false)
   const [gender, setGender] = useState('');
   const [errors, setErrors] = useState<GenderFieldErrors>({});
@@ -24,7 +25,9 @@ const AddGenderForm: FC<AddGenderFormProps> = ({onGenderAdded}) => {
       if (data && typeof data.message === 'string') {
         setGender('');
         setErrors({});
+        
         onGenderAdded(data.message)
+        refreshKey()
       } else {
         console.error('Unexpected error occured during store gender:', data)
     }
