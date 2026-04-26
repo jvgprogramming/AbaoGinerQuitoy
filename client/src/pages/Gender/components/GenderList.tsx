@@ -9,6 +9,7 @@ import {
 import type { GenderColumns } from '../../../interfaces/GenderColumns';
 import GenderService from '../../../services/GenderService';
 import Spinner from '../../../components/Spinner/Spinner';
+import { Link } from 'react-router-dom';
 
 interface GenderListProps {
   refreshKey: boolean
@@ -61,24 +62,32 @@ const GenderList: FC<GenderListProps> = ({refreshKey}) => {
                 >
                   Gender
                 </TableCell>
-                {/* <TableCell
+                <TableCell
                   isHeader
                   className="px-5 py-3 font-medium text-center"
                 >
                   Action
-                </TableCell> */}
+                </TableCell>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y dividegray100 text-gray-500 text-sm">
               {loadingGenders ? (
                 <TableRow>
-                  <TableCell colSpan={2} className="px-4 py-3 text-center">
+                  <TableCell colSpan={3} className="px-4 py-3 text-center">
                     <Spinner size="md"/>
                   </TableCell>
                 </TableRow>
               ) : genders.map((gender, index) => (
-                <TableRow className="hover:bg=gray=100" key={index}>
-                  <TableCell className="px-4 py-3 text-start">{gender.gender}
+                <TableRow className="hover:bg-gray-100" key={gender.gender_id}>
+                  <TableCell className="px-4 py-3 text-center">{index + 1}</TableCell>
+                  <TableCell className="px-4 py-3 text-start">{gender.gender}</TableCell>
+                  <TableCell className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center gap-4">
+                      <Link to={`/gender/edit/${gender.gender_id}`} className="text-green-600 font-medium hover:underline">
+                        Edit
+                      </Link>
+                      <Link to={`/gender/delete/${gender.gender_id}`} className="text-red-600 font-medium hover:underline">Delete</Link>
+                    </div>
                   </TableCell>
                 </TableRow>
               )) }
