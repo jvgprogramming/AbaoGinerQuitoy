@@ -11,7 +11,6 @@ const CloseButton: FC<CloseButtonProps> = ({
   label,
   onClose,
   newClassName,
-  className,
 }) => {
   return (
     <>

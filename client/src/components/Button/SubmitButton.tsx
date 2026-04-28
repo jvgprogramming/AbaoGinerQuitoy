@@ -28,14 +28,13 @@ const SubmitButton: FC<SubmitButtonProps> = ({
         disabled={loading}
       >
         {loading ? (
-          <>
-        <div className="flex gap-1">
-          <div>
-            
-        {<Spinner size="xs"/>}</div>
-        {loadingLabel}
-        </div>
-        </>) : label}
+          <span className="inline-flex items-center justify-center gap-2 text-white">
+            <Spinner size="sm" variant="onDark" />
+            {loadingLabel ?? label}
+          </span>
+        ) : (
+          label
+        )}
       </button>
     </>
   );
