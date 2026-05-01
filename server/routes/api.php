@@ -13,7 +13,8 @@ Route::controller(GenderController::class)->prefix('/gender')->group(function() 
     Route::put('/destroyGender/{gender}', 'destroyGender');
 });
 
-Route::controller(UserController::class)->prefix('/user')->group(Function(){
+Route::controller(UserController::class)->prefix('/user')->group(function () {
+    Route::get('/loadUsers', 'loadUsers');
     Route::post('/storeUser', 'storeUser');
 });
 

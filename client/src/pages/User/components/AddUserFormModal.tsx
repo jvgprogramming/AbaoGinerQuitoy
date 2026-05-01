@@ -63,6 +63,8 @@ interface AddUserFormModalProps {
         setPassword('')
         setPasswordConfirmation('')
         setErrors({})
+
+        handleLoadGenders();
       }else {
         console.error('Unexpected status error occured during adding user:', response.status)
       }
