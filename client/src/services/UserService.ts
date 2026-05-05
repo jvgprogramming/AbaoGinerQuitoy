@@ -16,6 +16,15 @@ const UserService = {
         } catch (error) {
             throw error;
         }
+    },
+
+    updateUser: async (userId: string, data:any) => {
+        try {
+            const response = await AxiosInstance.put(`/user/updateUser/${userId}`, data);
+            return response;
+        } catch (error) {
+            throw error;
+        }
     }
 };
 

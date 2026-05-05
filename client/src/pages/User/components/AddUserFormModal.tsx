@@ -13,9 +13,10 @@ interface AddUserFormModalProps {
   onUserAdded: (message: string) => void
   isOpen: boolean;
   onClose: () => void;
+  refreshKey: () => void;
 }
 
-  const AddUserFormModal: FC<AddUserFormModalProps> = ({ onUserAdded, isOpen, onClose }) => {
+  const AddUserFormModal: FC<AddUserFormModalProps> = ({ onUserAdded, isOpen, onClose, refreshKey }) => {
   const [loadingGenders, setLoadingGenders] = useState(false)
   const [genders, setGenders] = useState<GenderColumns[]>([])
 
@@ -52,7 +53,6 @@ interface AddUserFormModalProps {
       const response = await UserService.storeUser(payload)
 
       if(response.status === 200) {
-        onUserAdded(response.data.message)
         setFirstName('')
         setMiddleName('')
         setLastName('')
@@ -64,7 +64,9 @@ interface AddUserFormModalProps {
         setPasswordConfirmation('')
         setErrors({})
 
+        onUserAdded(response.data.message)
         handleLoadGenders();
+        refreshKey();
       }else {
         console.error('Unexpected status error occured during adding user:', response.status)
       }

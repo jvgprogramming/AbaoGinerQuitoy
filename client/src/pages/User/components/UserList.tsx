@@ -12,9 +12,11 @@ import Spinner from '../../../components/Spinner/Spinner';
 
 interface UserListProps {
   onAddUser: () => void;
+  onEditUser: (user: UserColumns | null ) => void;
+  refreshKey: boolean
 }
 
-const UserList: FC<UserListProps> = ({ onAddUser }) => {
+const UserList: FC<UserListProps> = ({ onAddUser, onEditUser, refreshKey }) => {
 const [loadingUsers, setLoadingUsers] = useState(false)
 const [users, setUsers] = useState<UserColumns[]>([])
 
@@ -53,7 +55,7 @@ const handleUserFullNameFormat = (user: UserColumns) => {
 
 useEffect(() => {
   handleLoadUsers()
-}, [])
+}, [refreshKey])
 
 
   return (
@@ -142,10 +144,18 @@ useEffect(() => {
                     </TableCell>
                     <TableCell className="px-5 py-3">
                       <div className="flex items-center justify-center gap-4">
-                        <button type="button" className="text-sm font-semibold text-green-600 hover:text-green-700">
+                        <button 
+                        type="button" 
+                        className="text-sm font-semibold text-green-600 hover:text-green-700"
+                        onClick={() => onEditUser(user)}
+                        >
                           Edit
                         </button>
-                        <button type="button" className="text-sm font-semibold text-red-600 hover:text-red-700">
+                        <button 
+                        type="button" 
+                        className="text-sm font-semibold text-red-600 hover:text-red-700"
+                        onClick={() => onEditUser(user)}
+                        >
                           Delete
                         </button>
                       </div>
