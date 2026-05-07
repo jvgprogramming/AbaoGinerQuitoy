@@ -4,11 +4,10 @@ import SubmitButton from "../../../components/Button/SubmitButton";
 import FloatingLabelInput from "../../../components/input/FloatingLabelInput";
 import Modal from "../../../components/Modal";
 import FloatingLabelSelect from "../../../components/select/FloatingLabelSelect";
-import type { UserColumns } from "../../../interfaces/UserColumns";
-import type { GenderColumns } from "../../../interfaces/GenderColumns";
-import type { UserFieldErrors } from "../../../interfaces/UserFieldErrors";
 import GenderService from "../../../services/GenderService";
 import UserService from "../../../services/UserService";
+import type { UserColumns, UserFieldErrors } from "../../../interfaces/UserInterface";
+import type { GenderColumns } from "../../../interfaces/GenderInterface";
 
 
 
@@ -107,7 +106,8 @@ const EditUserFormModal: FC<EditUserFormModalProps> = ({ user, onUserUpdate, ref
   }, [isOpen]);
 
     useEffect(() => {
-        if(user){
+        if(isOpen){
+            if(user){
             setFirstName(user.first_name)
             setMiddleName(user.middle_name ?? "")
             setLastName(user.last_name)
@@ -118,8 +118,9 @@ const EditUserFormModal: FC<EditUserFormModalProps> = ({ user, onUserUpdate, ref
         }else {
             console.error('unexpected error occured during loading user data: user data is null or undefined: ', user)
         }
-
-    },[user])
+        }
+    
+    },[isOpen, user])
   return (
     <>
         <Modal isOpen={isOpen} onClose={onClose} showCloseButton>
