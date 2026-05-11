@@ -1,4 +1,4 @@
-import { useEffect, useState, type FC } from 'react';
+import { useCallback, useEffect, useRef, useState, type FC } from 'react';
 import {
   Table,
   TableBody,
@@ -9,6 +9,7 @@ import {
 import UserService from '../../../services/UserService';
 import Spinner from '../../../components/Spinner/Spinner';
 import type { UserColumns } from '../../../interfaces/UserInterface';
+import FloatingLabelInput from '../../../components/input/FloatingLabelInput';
 
 interface UserListProps {
   onAddUser: () => void;
@@ -20,17 +21,34 @@ interface UserListProps {
 const UserList: FC<UserListProps> = ({ onAddUser, onEditUser, onDeleteUser, refreshKey }) => {
 const [loadingUsers, setLoadingUsers] = useState(false)
 const [users, setUsers] = useState<UserColumns[]>([])
+const [usersTableCurrentPage, setUsersTableCurrentPage] = useState(1)
+const [usersTableLastPage, setUsersTableLastPage] = useState(1)
+const [hasMore, setHasMore] = useState(true)
 
-const handleLoadUsers = async () => {
+const [search,setSearch] = useState('')
+const [debouncedSearch, setDebouncedSearch] = useState('')
+
+const tableRef = useRef<HTMLDivElement>(null)
+
+const handleLoadUsers = async (page: number, append = false ,search: string) => {
   try{
     setLoadingUsers(true)
 
-    const response = await UserService.loadUsers()
+    const response = await UserService.loadUsers(page, search)
 
     if(response.status === 200) {
-      setUsers(response.data.users)
+      const usersData = response.data.users.data || response.data.users || []
+      const lastPage = response.data.users.last_page || response.data.last_page || usersTableLastPage || 1
+
+      setUsers(append ? [...users, ...usersData] : usersData);
+      setUsersTableCurrentPage(page);
+      setUsersTableLastPage(lastPage);
+      setHasMore(page < lastPage);
+
+
     }else {
-      console.error('Unexpected status error occured during loading users:', response.status)
+      setUsers(append ? users : []);
+      setHasMore(false);
     }
   }catch(error) {
     console.error('Unexpected server error occured during loading users:', error)
@@ -38,6 +56,13 @@ const handleLoadUsers = async () => {
     setLoadingUsers(false)
   }
 };
+
+const handleScroll = useCallback(() => {
+  const ref = tableRef.current
+  if(ref && ref.scrollTop + ref.clientHeight >= ref.scrollHeight - 10 && hasMore && !loadingUsers) {
+    handleLoadUsers(usersTableCurrentPage + 1, true, debouncedSearch)
+  }
+}, [hasMore, loadingUsers, usersTableCurrentPage]);
 
 const handleUserFullNameFormat = (user: UserColumns) => {
   let fullName = ''
@@ -55,18 +80,47 @@ const handleUserFullNameFormat = (user: UserColumns) => {
 }
 
 useEffect(() => {
-  handleLoadUsers()
-}, [refreshKey])
+  const ref = tableRef.current
+  if(ref) {
+    ref.addEventListener('scroll', handleScroll)
+  }
+  return () => {
+    if(ref) {
+      ref.removeEventListener('scroll', handleScroll)
+    }
+  }
+}, [handleScroll])
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setDebouncedSearch(search)
+  }, 800);
+  return () => clearTimeout(timer)
+}, [search])
+
+
+useEffect(() => {
+  setUsers([])
+  setUsersTableCurrentPage(1)
+  setHasMore(true)
+
+  handleLoadUsers(1, false, debouncedSearch);
+}, [refreshKey, debouncedSearch])
 
 
   return (
     <>
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-        <div className="max-w-full overflow-x-auto">
+        <div 
+        ref={tableRef}
+        className="relative max-w-full max-h-[calc(100vh-8.5rem)] overflow-x-auto">
           <Table>
             <caption className="mb-0">
               <div className="border-b border-gray-100">
-                <div className="flex justify-end p-4">
+                <div className="flex justify-between p-4">
+                  <div className="w-64">
+                    <FloatingLabelInput label="Search" type="text" name="search" value={search} onChange={(e) => setSearch(e.target.value)} autoFocus />
+                  </div>
                   <button
                     type="button"
                     className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 cursor-pointer"
@@ -119,14 +173,8 @@ useEffect(() => {
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-200 text-sm text-gray-600">
-              {loadingUsers ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="px-5 py-5 text-center">
-                    <Spinner size="md"/>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                 users.map((user, index) => (
+              {(users.length ?? 0) > 0 ? (
+                users.map((user, index) => (
                   <TableRow className="bg-white transition hover:bg-gray-50" key={index}>
                     <TableCell className="px-5 py-3 text-center">
                       {index + 1}
@@ -163,9 +211,29 @@ useEffect(() => {
                     </TableCell>
                   </TableRow>
                  ))
-              )}
+              ): !loadingUsers && (users.length ?? 0) <= 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="px-5 py-5 text-center font-medium">
+                    NO USERS FOUND
+                  </TableCell>
+                </TableRow>
+              ):(
+                <TableRow>
+                  <TableCell colSpan={6} className="px-5 py-5 text-center">
+                    <Spinner size="md"/>
+                  </TableCell>
+                </TableRow>
                 
-              
+              )}
+
+              {loadingUsers && (users.length ?? 0) > 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="px-5 py-5 text-center">
+                    <Spinner size="md"/>
+                  </TableCell>
+                </TableRow>
+              )}
+
             </TableBody>
           </Table>
         </div>

@@ -9,10 +9,29 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function loadUsers() {
+    public function loadUsers(request $request) {
+
+        $search = $request->input('search');
+
         $users = User::with('gender')
+            ->leftJoin('tbl_genders', 'tbl_users.gender_id', '=', 'tbl_genders.gender_id')
             ->where('tbl_users.is_deleted', false)
-            ->get();
+            ->orderBy('tbl_users.last_name', 'asc')
+            ->orderBy('tbl_users.first_name', 'asc')
+            ->orderBy('tbl_users.middle_name', 'asc')
+            ->orderBy('tbl_users.suffix_name', 'asc');
+
+        if($search) {
+             $users->where(function($user) use ($search) {
+                $user->where('tbl_users.first_name', 'like', "%{$search}%")
+                      ->orWhere('tbl_users.middle_name', 'like', "%{$search}%")
+                      ->orWhere('tbl_users.last_name', 'like', "%{$search}%")
+                      ->orWhere('tbl_users.suffix_name', 'like', "%{$search}%")
+                      ->orWhere('tbl_genders.gender', 'like', "%{$search}%");
+            });
+        }
+
+            $users = $users->paginate(10);
 
         return response()->json([
             'users' => $users
