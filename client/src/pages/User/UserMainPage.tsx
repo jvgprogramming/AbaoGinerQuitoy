@@ -13,7 +13,7 @@ const UserMainPage = () => {
 
   const { isOpen: isDeleteFormModalOpen, selectedUser: selectedUserForDelete , openModal: openDeleteUserFormModal, closeModal: closeDeleteUserFormModal } = useModal(false);
 
-  const {message: toastMessage, isVisible: toastMessageIsVisible, showToastMessage, closeToastMessage,} = useToastMessage('', false)
+  const {message: toastMessage, isVisible: toastMessageIsVisible, showToastMessage, closeToastMessage,} = useToastMessage('', false,false);
 
   const { refresh , handleRefresh} = useRefresh(false)
 

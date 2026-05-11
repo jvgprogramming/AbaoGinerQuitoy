@@ -1,10 +1,52 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useHeader } from '../contexts/HeaderContext';
 import { useSidebar } from '../contexts/SidebarContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useEffect, useState, type MouseEvent } from 'react';
 
 const AppHeader = () => {
   const { isOpen, toggleUserMenu } = useHeader();
   const { toggleSidebar } = useSidebar();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const [isloading, setIsLoading] = useState(false);
+
+  const handleLogout = async (e: MouseEvent<HTMLButtonElement>) => {
+    try {
+      e.preventDefault();
+      setIsLoading(true);
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Unexpected server error occurred during logout:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUserFullFomat = (user:  any) => {
+    if (!user) return '';
+
+    let fullName = `${user.user.first_name} ${user.user.last_name}`;
+
+    if (user.user.middle_name){
+      fullName += ` ${user.user.middle_name.charAt(0)}.`;
+    }
+
+    if (user.user.suffix_name){
+      fullName += ` ${user.user.suffix_name}`;
+    }
+
+    return fullName;
+
+  }
+
+  useEffect(() => {
+    if (user) {
+      handleUserFullFomat(user);
+    }
+  }, [user])
 
   return (
     <>
@@ -78,24 +120,25 @@ const AppHeader = () => {
                       className="text-sm text-gray-900 dark:text-white"
                       role="none"
                     >
-                      Neil Sims
+                      {handleUserFullFomat(user)} 
                     </p>
                     <p
                       className="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
                       role="none"
                     >
-                      neil.sims@flowbite.com
+                      
                     </p>
                   </div>
                   <ul className="py-1" role="none">
                     <li>
-                      <Link
-                        to="#"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                        role="menuitem"
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white w-full text-left cursor-pointer disabled:cursor-not-allowed "
+                        role="menuitem" disabled={isloading}
                       >
-                        Sign out
-                      </Link>
+                        {isloading ? 'Signing out...' : 'Sign out'}
+                      </button>
                     </li>
                   </ul>
                 </div>
