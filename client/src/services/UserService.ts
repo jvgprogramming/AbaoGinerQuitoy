@@ -20,7 +20,7 @@ const UserService = {
 
     updateUser: async (userId: string, data:any) => {
         try {
-            const response = await AxiosInstance.put(`/user/updateUser/${userId}`, data);
+            const response = await AxiosInstance.post(`/user/updateUser/${userId}`, data);
             return response;
         } catch (error) {
             throw error;

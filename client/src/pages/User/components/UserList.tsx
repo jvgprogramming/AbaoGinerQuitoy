@@ -131,10 +131,11 @@ useEffect(() => {
                 </div>
               </div>
             </caption>
-            <TableHeader className="bg-blue-600 text-xs text-white">
+            <TableHeader className="sticky top-0 z-10 bg-blue-600 text-xs text-white">
               <TableRow>
                 <TableCell
                   isHeader
+                  colSpan={2}
                   className="px-5 py-3 text-center font-semibold tracking-wide"
                 >
                   No.
@@ -179,6 +180,18 @@ useEffect(() => {
                     <TableCell className="px-5 py-3 text-center">
                       {index + 1}
                     </TableCell>
+                    <TableCell className='py-3 items-end justify-end '>   
+                      {user.profile_picture? (
+                        <img src={user.profile_picture} alt={handleUserFullNameFormat(user)} className='object-cover w-10 h-10 rounded-full' />
+                      ):(
+                        <div className="relative inline-flex items-center justify-center w-10 h-10 text-cent text-sm overflow-hidden bg-gray-300 rounded-full">
+                          <span className='font-medium text-gray-600'>
+                            {`${user.last_name.charAt(0)}
+                            ${user.first_name.charAt(0)}`}
+                          </span>
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell className="px-5 py-3 text-left">
                       {handleUserFullNameFormat(user)}
                     </TableCell>
@@ -213,13 +226,13 @@ useEffect(() => {
                  ))
               ): !loadingUsers && (users.length ?? 0) <= 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="px-5 py-5 text-center font-medium">
+                  <TableCell colSpan={7} className="px-5 py-5 text-center font-medium">
                     NO USERS FOUND
                   </TableCell>
                 </TableRow>
               ):(
                 <TableRow>
-                  <TableCell colSpan={6} className="px-5 py-5 text-center">
+                  <TableCell colSpan={7} className="px-5 py-5 text-center">
                     <Spinner size="md"/>
                   </TableCell>
                 </TableRow>
@@ -228,7 +241,7 @@ useEffect(() => {
 
               {loadingUsers && (users.length ?? 0) > 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="px-5 py-5 text-center">
+                  <TableCell colSpan={7} className="px-5 py-5 text-center">
                     <Spinner size="md"/>
                   </TableCell>
                 </TableRow>
